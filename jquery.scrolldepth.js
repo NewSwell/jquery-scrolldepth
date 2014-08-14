@@ -14,7 +14,9 @@
     percentage: true,
     userTiming: true,
     pixelDepth: true,
-    nonInteraction: true
+    nonInteraction: true,
+    baseline: true,
+    eventCategory: 'Scroll Depth'
   };
 
   var $window = $(window),
@@ -56,10 +58,10 @@
       googleTagManager = true;
     }
 
-    if (options.percentage) {
+    if (options.percentage && options.baseline) {
       // Establish baseline (0% scroll)
       sendEvent('Percentage', 'Baseline');
-    } else if (options.elements) {
+    } else if (options.elements.length && options.baseline) {
       sendEvent('Elements', 'Baseline');
     }
 
@@ -71,45 +73,45 @@
 
       if (googleTagManager) {
 
-        dataLayer.push({'event': 'ScrollDistance', 'eventCategory': 'Scroll Depth', 'eventAction': action, 'eventLabel': label, 'eventValue': 1, 'eventNonInteraction': options.nonInteraction});
+        dataLayer.push({'event': 'ScrollDistance', 'eventCategory': options.eventCategory, 'eventAction': action, 'eventLabel': label, 'eventValue': 1, 'eventNonInteraction': options.nonInteraction});
 
         if (options.pixelDepth && arguments.length > 2 && scrollDistance > lastPixelDepth) {
           lastPixelDepth = scrollDistance;
-          dataLayer.push({'event': 'ScrollDistance', 'eventCategory': 'Scroll Depth', 'eventAction': 'Pixel Depth', 'eventLabel': rounded(scrollDistance), 'eventValue': 1, 'eventNonInteraction': options.nonInteraction});
+          dataLayer.push({'event': 'ScrollDistance', 'eventCategory': options.eventCategory, 'eventAction': 'Pixel Depth', 'eventLabel': rounded(scrollDistance), 'eventValue': 1, 'eventNonInteraction': options.nonInteraction});
         }
 
         if (options.userTiming && arguments.length > 3) {
-          dataLayer.push({'event': 'ScrollTiming', 'eventCategory': 'Scroll Depth', 'eventAction': action, 'eventLabel': label, 'eventTiming': timing});
+          dataLayer.push({'event': 'ScrollTiming', 'eventCategory': options.eventCategory, 'eventAction': action, 'eventLabel': label, 'eventTiming': timing});
         }
 
       } else {
 
         if (universalGA) {
 
-          ga('send', 'event', 'Scroll Depth', action, label, 1, {'nonInteraction': options.nonInteraction ? 1 : 0});
+          ga('send', 'event', options.eventCategory, action, label, 1, {'nonInteraction': options.nonInteraction ? 1 : 0});
 
           if (options.pixelDepth && arguments.length > 2 && scrollDistance > lastPixelDepth) {
             lastPixelDepth = scrollDistance;
-            ga('send', 'event', 'Scroll Depth', 'Pixel Depth', rounded(scrollDistance), 1, {'nonInteraction': options.nonInteraction ? 1 : 0});
+            ga('send', 'event', options.eventCategory, 'Pixel Depth', rounded(scrollDistance), 1, {'nonInteraction': options.nonInteraction ? 1 : 0});
           }
 
           if (options.userTiming && arguments.length > 3) {
-            ga('send', 'timing', 'Scroll Depth', action, timing, label);
+            ga('send', 'timing', options.eventCategory, action, timing, label);
           }
 
         }
 
         if (classicGA) {
 
-          _gaq.push(['_trackEvent', 'Scroll Depth', action, label, 1, options.nonInteraction]);
+          _gaq.push(['_trackEvent', options.eventCategory, action, label, 1, options.nonInteraction]);
 
           if (options.pixelDepth && arguments.length > 2 && scrollDistance > lastPixelDepth) {
             lastPixelDepth = scrollDistance;
-            _gaq.push(['_trackEvent', 'Scroll Depth', 'Pixel Depth', rounded(scrollDistance), 1, options.nonInteraction]);
+            _gaq.push(['_trackEvent', options.eventCategory, 'Pixel Depth', rounded(scrollDistance), 1, options.nonInteraction]);
           }
 
           if (options.userTiming && arguments.length > 3) {
-            _gaq.push(['_trackTiming', 'Scroll Depth', action, timing, label, 100]);
+            _gaq.push(['_trackTiming', options.eventCategory, action, timing, label, 100]);
           }
 
         }
